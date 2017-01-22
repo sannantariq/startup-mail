@@ -1,0 +1,21 @@
+#!/bin/sh -e
+echo "Hello Sannan"
+sleep 30
+
+_IP=$(hostname -I) || true
+
+printf "$_IP"
+if [ "$_IP" ]; then
+	printf "My IP address is %s\n" "$_IP"
+	python /home/pi/startup-mail/startup_mailer.py
+fi
+
+if [ ! -e /root/firstboot_done ]; then
+	touch /root/firstboot_done
+	if [ -e /root/firstboot.sh ]; then
+		/root/firstboot.sh
+	fi
+fi
+
+exit 0
+
