@@ -17,6 +17,10 @@ def connect_type(word_list):
         con_type = 'wifi'
     elif 'eth0' in word_list:
         con_type = 'ethernet'
+    elif 'docker0' in word_list:
+	con_type = 'docker'
+    elif 'flannel0' in word_list:
+	con_type = 'flanneld'
     else:
         con_type = 'current'
 
@@ -39,9 +43,15 @@ arg='ip route list'  # Linux command to retrieve ip addresses.
 # Runs 'arg' in a 'hidden terminal'.
 p=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
 data = p.communicate()  # Get data from 'p terminal'.
-
+ip_msg = ''
 # Split IP text block into three, and divide the two containing IPs into words.
 ip_lines = data[0].splitlines()
+for line in ip_lines[1:]:
+	split_line = line.split()
+	ip_type = connect_type(split_line)
+
+	ip_addr = split_line[split_line.index('src') + 1]
+	ip_msg += 'Your %s ip is %s\n' % (ip_type, ip_addr)
 split_line_a = ip_lines[1].split()
 if len(ip_lines) > 2: 
 	split_line_b = ip_lines[2].split()
@@ -62,8 +72,9 @@ my_ip_a = 'Your %s ip is %s' % (ip_type_a, ipaddr_a)
 #my_ip_b = 'Your %s ip is %s' % (ip_type_b, ipaddr_b)
 my_ip_b = "EXTRA_IP_HERE"
 # Creates the text, subject, 'from', and 'to' of the message.
-msg = MIMEText(my_ip_a + "\n" + my_ip_b)
-msg['Subject'] = 'IPs For rpi-worker-0 on %s' % today.strftime('%b %d %Y')
+#msg = MIMEText(my_ip_a + "\n" + my_ip_b)
+msg = MIMEText(ip_msg)
+msg['Subject'] = 'IPs For rpi-master on %s' % today.strftime('%b %d %Y')
 msg['From'] = gmail_user
 msg['To'] = to
 # Sends the message
