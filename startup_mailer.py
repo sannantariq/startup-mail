@@ -32,6 +32,9 @@ to = 'rpinsl2050@gmail.com' # Email to send to.
 gmail_user = 'rpinsl2050@gmail.com' # Email to send from. (MUST BE GMAIL)
 gmail_password = 'nsl2050edison' # Gmail password.
 smtpserver = smtplib.SMTP('smtp.gmail.com', 587) # Server to use.
+arg = 'hostname'
+p=subprocess.Popen(arg,shell=True,stdout=subprocess.PIPE)
+hostname = p.communicate()[0]
 
 smtpserver.ehlo()  # Says 'hello' to the server
 smtpserver.starttls()  # Start TLS encryption
@@ -52,29 +55,9 @@ for line in ip_lines[1:]:
 
 	ip_addr = split_line[split_line.index('src') + 1]
 	ip_msg += 'Your %s ip is %s\n' % (ip_type, ip_addr)
-split_line_a = ip_lines[1].split()
-if len(ip_lines) > 2: 
-	split_line_b = ip_lines[2].split()
 
-# con_type variables for the message text. ex) 'ethernet', 'wifi', etc.
-ip_type_a = connect_type(split_line_a)
-#ip_type_b = connect_type(split_line_b)
-
-"""Because the text 'src' is always followed by an ip address,
-we can use the 'index' function to find 'src' and add one to
-get the index position of our ip.
-"""
-ipaddr_a = split_line_a[split_line_a.index('src')+1]
-#ipaddr_b = split_line_b[split_line_b.index('src')+1]
-
-# Creates a sentence for each ip address.
-my_ip_a = 'Your %s ip is %s' % (ip_type_a, ipaddr_a)
-#my_ip_b = 'Your %s ip is %s' % (ip_type_b, ipaddr_b)
-my_ip_b = "EXTRA_IP_HERE"
-# Creates the text, subject, 'from', and 'to' of the message.
-#msg = MIMEText(my_ip_a + "\n" + my_ip_b)
 msg = MIMEText(ip_msg)
-msg['Subject'] = 'IPs For rpi-master on %s' % today.strftime('%b %d %Y')
+msg['Subject'] = 'IPs For %s on %s' % (hostname, today.strftime('%b %d %Y'))
 msg['From'] = gmail_user
 msg['To'] = to
 # Sends the message
